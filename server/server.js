@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -64,9 +65,10 @@ app.post('/api/run', async (req, res) => {
 
 app.get('/health', (_req, res) => res.json({ ok: true }));
 
-app.get('/', (_req, res) => {
-  res.send('CodeRun API server is running. Open <a href="http://localhost:5173">http://localhost:5173</a> for the app.');
-});
+// Serve the built React frontend (production)
+const clientDist = path.join(__dirname, '..', 'client', 'dist');
+app.use(express.static(clientDist));
+app.get('*', (_req, res) => res.sendFile(path.join(clientDist, 'index.html')));
 
 app.listen(PORT, () => {
   console.log(`CodeRun server running on http://localhost:${PORT}`);
